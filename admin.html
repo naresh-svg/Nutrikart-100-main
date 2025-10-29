@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriKart Admin Panel</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .admin-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .admin-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            border-left: 4px solid #7ebcaf;
+        }
+        .admin-card h3 {
+            margin-top: 0;
+            color: #7ebcaf;
+        }
+        .btn {
+            background: #7ebcaf;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+            font-size: 14px;
+        }
+        .btn:hover {
+            background: #6ba89a;
+        }
+        .btn-danger {
+            background: #dc3545;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin: 20px 0;
+        }
+        .stat-card {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 24px;
+            font-weight: bold;
+            color: #7ebcaf;
+        }
+        .log-area {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            height: 200px;
+            overflow-y: auto;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+    </style>
+    <!-- Supabase JavaScript Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <div class="admin-container">
+        <h1>🥗 NutriKart Admin Panel</h1>
+        
+        <!-- Database Statistics -->
+        <div class="admin-card">
+            <h3>📊 Database Statistics</h3>
+            <div class="stats-grid" id="statsGrid">
+                <div class="stat-card">
+                    <div class="stat-number" id="userCount">-</div>
+                    <div>Users</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="groceryCount">-</div>
+                    <div>Groceries</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" id="reviewCount">-</div>
+                    <div>Reviews</div>
+                </div>
+            </div>
+            <button class="btn" onclick="loadStats()">Refresh Stats</button>
+        </div>
+
+        <!-- User Management -->
+        <div class="admin-card">
+            <h3>👥 User Management</h3>
+            <button class="btn" onclick="loadUsers()">View All Users</button>
+            <button class="btn btn-danger" onclick="clearAllData()">Clear All User Data</button>
+        </div>
+
+        <!-- Grocery Management -->
+        <div class="admin-card">
+            <h3>🛒 Grocery Management</h3>
+            <button class="btn" onclick="loadGroceryStats()">View Grocery Stats</button>
+            <button class="btn" onclick="addSampleGroceries()">Add Sample Groceries</button>
+        </div>
+
+        <!-- Reviews Management -->
+        <div class="admin-card">
+            <h3>⭐ Reviews Management</h3>
+            <button class="btn" onclick="loadReviews()">View All Reviews</button>
+        </div>
+
+        <!-- System Operations -->
+        <div class="admin-card">
+            <h3>🔧 System Operations</h3>
+            <button class="btn" onclick="testConnection()">Test Database Connection</button>
+            <button class="btn" onclick="clearLog()">Clear Log</button>
+        </div>
+
+        <!-- Log Area -->
+        <div class="admin-card">
+            <h3>📝 Operation Log</h3>
+            <div class="log-area" id="logArea">
+                <div class="success">✅ Admin panel loaded successfully!</div>
+                <div>Ready to perform operations...</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="admin-setup.js"></script>
+    <script>
+        // Admin panel functions
+        function log(message, type = 'info') {
+            const logArea = document.getElementById('logArea');
+            const timestamp = new Date().toLocaleTimeString();
+            const className = type === 'error' ? 'error' : type === 'success' ? 'success' : type === 'warning' ? 'warning' : '';
+            logArea.innerHTML += `<div class="${className}">[${timestamp}] ${message}</div>`;
+            logArea.scrollTop = logArea.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('logArea').innerHTML = '<div class="success">✅ Log cleared!</div>';
+        }
+
+        async function loadStats() {
+            log('Loading database statistics...');
+            try {
+                const stats = await adminFunctions.getDatabaseStats();
+                if (stats) {
+                    document.getElementById('userCount').textContent = stats.users;
+                    document.getElementById('groceryCount').textContent = stats.groceries;
+                    document.getElementById('reviewCount').textContent = stats.reviews;
+                    log('✅ Statistics loaded successfully', 'success');
+                }
+            } catch (error) {
+                log('❌ Error loading statistics: ' + error.message, 'error');
+            }
+        }
+
+        async function loadUsers() {
+            log('Loading all users...');
+            try {
+                const users = await adminFunctions.getAllUsers();
+                log(`✅ Found ${users.length} users`, 'success');
+                console.log('Users:', users);
+            } catch (error) {
+                log('❌ Error loading users: ' + error.message, 'error');
+            }
+        }
+
+        async function loadGroceryStats() {
+            log('Loading grocery statistics...');
+            try {
+                const stats = await adminFunctions.getGroceryStats();
+                log('✅ Grocery statistics loaded', 'success');
+                console.log('Grocery Stats:', stats);
+            } catch (error) {
+                log('❌ Error loading grocery stats: ' + error.message, 'error');
+            }
+        }
+
+        async function loadReviews() {
+            log('Loading all reviews...');
+            try {
+                const reviews = await adminFunctions.getAllReviews();
+                log(`✅ Found ${reviews.length} reviews`, 'success');
+                console.log('Reviews:', reviews);
+            } catch (error) {
+                log('❌ Error loading reviews: ' + error.message, 'error');
+            }
+        }
+
+        async function addSampleGroceries() {
+            log('Adding sample groceries...');
+            try {
+                const result = await adminFunctions.addSampleGroceries();
+                if (result) {
+                    log('✅ Sample groceries added successfully', 'success');
+                    loadStats(); // Refresh stats
+                }
+            } catch (error) {
+                log('❌ Error adding sample groceries: ' + error.message, 'error');
+            }
+        }
+
+        async function clearAllData() {
+            log('⚠️ Attempting to clear all user data...', 'warning');
+            try {
+                const result = await adminFunctions.clearAllUserData();
+                if (result) {
+                    log('✅ All user data cleared', 'success');
+                    loadStats(); // Refresh stats
+                }
+            } catch (error) {
+                log('❌ Error clearing data: ' + error.message, 'error');
+            }
+        }
+
+        async function testConnection() {
+            log('Testing database connection...');
+            try {
+                const result = await adminFunctions.testConnection();
+                if (result) {
+                    log('✅ Database connection successful', 'success');
+                } else {
+                    log('❌ Database connection failed', 'error');
+                }
+            } catch (error) {
+                log('❌ Connection test error: ' + error.message, 'error');
+            }
+        }
+
+        // Auto-load stats on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadStats();
+        });
+    </script>
+</body>
+</html>

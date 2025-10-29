@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriKart | Login</title>
+  <link rel="stylesheet" href="login.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Supabase JavaScript Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-box">
+      <h1>🥗 NutriKart</h1>
+      <h2>Welcome Back!</h2>
+      <p class="subtitle">Log in to continue your healthy journey</p>
+
+      <form id="loginForm">
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Enter your password" required />
+        </div>
+
+        <button type="submit" class="btn-login">Login</button>
+
+        <p class="signup-text">
+          Don't have an account? <a href="signup.html">Sign up</a>
+        </p>
+        
+        <div style="margin-top: 20px; padding: 15px; background-color: #f8f9fa; border-radius: 10px; font-size: 14px; color: #666;">
+          
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://knbwwhsrsszrhrcsgvxg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuYnd3aHNyc3N6cmhyY3NndnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDIxMTUsImV4cCI6MjA3Njk3ODExNX0.W0gogF-_MIzPPWv3MoN-xPUgDaQQJzGDrXhPJsl6Qpw';
+    
+    // Initialize Supabase client
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', async function() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        window.location.href = 'Nutri.html';
+      }
+    });
+
+    // Login with Supabase
+    document.getElementById('loginForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+
+      if (email === "" || password === "") {
+        alert("Please enter all fields.");
+        return;
+      }
+
+      try {
+        const { data, error } = await supabaseClient.auth.signInWithPassword({
+          email: email,
+          password: password
+        });
+
+        if (error) {
+          alert("Login failed: " + error.message);
+          return;
+        }
+
+        if (data.user) {
+          // Check if email is verified
+          if (!data.user.email_confirmed_at) {
+            alert("Please verify your email before logging in. Check your email for the verification link. 📧");
+            return;
+          }
+          
+          // Set login status
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('currentUser', JSON.stringify(data.user));
+          
+          alert("Login Successful ✅");
+          window.location.href = "Nutri.html";
+        }
+      } catch (error) {
+        alert("Login failed: " + error.message);
+      }
+    });
+
+    // Handle signup link click
+    document.querySelector('.signup-text a').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'signup.html';
+    });
+  </script>
+
+</body>
+</html>

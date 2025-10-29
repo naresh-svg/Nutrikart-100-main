@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout • NutriKart Marketplace</title>
+  <link rel="stylesheet" href="Nutri.css" />
+  <link rel="stylesheet" href="marketplace.css" />
+  <script defer src="env.js"></script>
+  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="supabaseClient.js"></script>
+  <script defer src="marketplace.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>Checkout</h1>
+      <div class="header-controls">
+        <a class="logout-btn" href="marketplace.html">Back to Marketplace</a>
+      </div>
+    </div>
+    <p class="header-subtitle">NutriKart Marketplace – Demo Checkout</p>
+  </header>
+
+  <main class="section checkout-layout">
+    <section class="billing-panel">
+      <h2>Billing Details</h2>
+      <form id="billing-form" novalidate>
+        <div class="form-group">
+          <label for="name">Full Name</label>
+          <input type="text" id="name" name="name" required autocomplete="name" />
+        </div>
+        <div class="form-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" required autocomplete="email" />
+        </div>
+        <div class="form-group">
+          <label for="address">Address</label>
+          <textarea id="address" name="address" rows="3" required autocomplete="street-address"></textarea>
+        </div>
+        <button id="confirm-btn" class="continue-btn" type="submit">Confirm Purchase</button>
+        <p class="checkout-note">This is a demo. No real payment is processed.</p>
+      </form>
+      <div id="success-box" class="success hidden" role="status">
+        <div class="success-icon">✅</div>
+        <h3>Your order has been placed successfully — no payment processed.</h3>
+        <a class="continue-btn" href="Nutri.html">Return to Dashboard</a>
+      </div>
+    </section>
+
+    <aside class="order-summary" aria-labelledby="order-title">
+      <h2 id="order-title">Order Summary</h2>
+      <table class="summary-table">
+        <thead>
+          <tr><th>Item</th><th>Qty</th><th>Price</th><th>Total</th></tr>
+        </thead>
+        <tbody id="order-items"></tbody>
+        <tfoot>
+          <tr class="summary-total"><td colspan="3">Subtotal</td><td id="order-subtotal">₹0</td></tr>
+        </tfoot>
+      </table>
+    </aside>
+  </main>
+
+  <div id="toast" class="notification hidden"></div>
+</body>
+</html>
+
+

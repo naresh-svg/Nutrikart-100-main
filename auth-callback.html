@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriKart | Verifying...</title>
+  <link rel="stylesheet" href="login.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Supabase JavaScript Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-box">
+      <h1>🥗 NutriKart</h1>
+      <h2>Verifying Email...</h2>
+      <p class="subtitle">Please wait while we verify your account</p>
+
+      <div id="verification-content">
+        <div style="text-align: center; padding: 20px;">
+          <div style="font-size: 48px; margin-bottom: 20px; animation: spin 2s linear infinite;">⏳</div>
+          <h3 style="color: #7ebcaf; margin-bottom: 20px;">Processing Verification...</h3>
+          <p>Setting up your NutriKart account...</p>
+          
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #666;">
+              <strong>Almost there!</strong><br>
+              We're creating your personalized dashboard...
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <style>
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://knbwwhsrsszrhrcsgvxg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuYnd3aHNyc3N6cmhyY3NndnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDIxMTUsImV4cCI6MjA3Njk3ODExNX0.W0gogF-_MIzPPWv3MoN-xPUgDaQQJzGDrXhPJsl6Qpw';
+    
+    // Initialize Supabase client
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Handle email verification and redirect directly to dashboard
+    document.addEventListener('DOMContentLoaded', async function() {
+      try {
+        // Check if user is authenticated
+        const { data: { user }, error } = await supabaseClient.auth.getUser();
+        
+        if (error || !user) {
+          // Not authenticated, redirect to login
+          console.log('No user found, redirecting to login');
+          window.location.href = 'login.html';
+          return;
+        }
+
+        // Check if email is confirmed
+        if (!user.email_confirmed_at) {
+          // Email not confirmed yet, redirect to login with message
+          console.log('Email not confirmed, redirecting to login');
+          window.location.href = 'login.html?message=Please verify your email first';
+          return;
+        }
+
+        // Email is confirmed, proceed with setup
+        await handleVerifiedUser(user);
+        
+        // Redirect directly to dashboard
+        window.location.href = 'Nutri.html';
+        
+      } catch (error) {
+        console.error('Error checking verification:', error);
+        window.location.href = 'login.html';
+      }
+    });
+
+    // Handle verified user
+    async function handleVerifiedUser(user) {
+      try {
+        // Check if user data already exists
+        const { data: existingData, error: fetchError } = await supabaseClient
+          .from('user_data')
+          .select('*')
+          .eq('user_id', user.id)
+          .single();
+
+        if (fetchError && fetchError.code !== 'PGRST116') {
+          console.error('Error fetching user data:', fetchError);
+          return;
+        }
+
+        if (!existingData) {
+          // Create user data if it doesn't exist
+          const userData = {
+            user_id: user.id,
+            username: user.user_metadata?.username || user.user_metadata?.full_name || 'User',
+            email: user.email,
+            goal: "",
+            budget: 1000,
+            cart: [],
+            weekly_plan: {},
+            reviews: [],
+            ingredients: [],
+            recipe_ingredients: [],
+            daily_calories: 0,
+            target_calories: 2000
+          };
+
+          const { error: insertError } = await supabaseClient
+            .from('user_data')
+            .insert(userData);
+
+          if (insertError) {
+            console.error('Error creating user data:', insertError);
+          }
+        }
+
+        // Set login status
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('currentUser', JSON.stringify(user));
+        
+      } catch (error) {
+        console.error('Error handling verified user:', error);
+      }
+    }
+  </script>
+
+</body>
+</html>

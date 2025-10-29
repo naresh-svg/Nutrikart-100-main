@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriKart Marketplace</title>
+  <link rel="stylesheet" href="Nutri.css" />
+  <link rel="stylesheet" href="marketplace.css" />
+  <script defer src="env.js"></script>
+  <script defer src="https://unpkg.com/@supabase/supabase-js@2"></script>
+  <script defer src="supabaseClient.js"></script>
+  <script defer src="marketplace.js"></script>
+</head>
+<body>
+  <header>
+    <div class="header-top">
+      <h1>NutriKart Marketplace</h1>
+      <div class="header-controls">
+        <a class="logout-btn" href="Nutri.html">Back to Dashboard</a>
+      </div>
+    </div>
+    <p class="header-subtitle">NutriKart Marketplace – Demo Checkout</p>
+  </header>
+
+  <main class="section">
+    <div class="marketplace-layout">
+      <section class="products-panel">
+        <div class="section-info">Browse products and add them to your cart. This is a demo — no payments are processed.</div>
+        <div class="marketplace-actions">
+          <button id="migrate-btn" class="continue-btn" style="margin-bottom: 15px;">Migrate Groceries to Products</button>
+        </div>
+        <div id="product-grid" class="product-grid" aria-live="polite"></div>
+        <div id="products-empty" class="empty hidden">No products found.</div>
+      </section>
+
+      <aside class="cart-panel" aria-labelledby="cart-title">
+        <h2 id="cart-title">Your Cart</h2>
+        <div class="cart-summary-box">
+          <div class="summary-row"><span>Items</span><span id="cart-count">0</span></div>
+          <div class="summary-row"><span>Subtotal</span><span id="cart-subtotal">₹0</span></div>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <button id="checkout-btn" class="continue-btn" disabled>Checkout</button>
+      </aside>
+    </div>
+  </main>
+
+  <div id="toast" class="notification hidden"></div>
+</body>
+</html>
+
+

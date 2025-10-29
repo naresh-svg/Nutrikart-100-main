@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NutriKart Chatbot</title>
+    <link rel="stylesheet" href="chatbot.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet">
+    <!-- Supabase JavaScript Client -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+    <!-- DEMO: Gemini API key (insecure to store in client-side for real projects) -->
+    <script>
+      // Demo key provided by user (do NOT use in production).
+      // Access this from other scripts as window.GEMINI_API_KEY
+      window.GEMINI_API_KEY = "AIzaSyCMlN9eSb-PwFzqgT9-R0eWIq7WjJ3-Na4";
+      // Demo helper: build a request URL (example)
+      window.GENERATIVE_API_URL = "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=" + window.GEMINI_API_KEY;
+    </script>
+</head>
+<body>
+    <div class="chatbot-container">
+        <!-- Chatbot Header -->
+        <div class="chatbot-header">
+            <div class="chatbot-avatar">
+                <div class="avatar-circle">🥗</div>
+                <div class="avatar-info">
+                    <h3>NutriKart AI</h3>
+                    <p>Your personal nutrition assistant</p>
+                </div>
+            </div>
+            <div class="chatbot-controls">
+                <button id="minimize-btn" class="control-btn">−</button>
+                <button id="close-btn" class="control-btn">×</button>
+            </div>
+        </div>
+
+        <!-- Mode Selection -->
+        <div class="mode-selection" id="mode-selection">
+            <h4>Choose your chat mode:</h4>
+            <div class="mode-options">
+                <button class="mode-btn" data-mode="reflect">
+                    <div class="mode-icon">🤔</div>
+                    <div class="mode-info">
+                        <h5>Reflect Mode</h5>
+                        <p>Talk about how you felt after today's meals</p>
+                    </div>
+                </button>
+                <button class="mode-btn" data-mode="coach">
+                    <div class="mode-icon">💪</div>
+                    <div class="mode-info">
+                        <h5>Coach Mode</h5>
+                        <p>Plan tomorrow's meals with AI guidance</p>
+                    </div>
+                </button>
+                <button class="mode-btn" data-mode="guide">
+                    <div class="mode-icon">👥</div>
+                    <div class="mode-info">
+                        <h5>Guide Mode</h5>
+                        <p>Team challenges and community features</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- Chat Interface -->
+        <div class="chat-interface" id="chat-interface" style="display: none;">
+            <div class="chat-messages" id="chat-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar">🥗</div>
+                    <div class="message-content">
+                        <p>Hello! I'm your NutriKart AI assistant. How can I help you today?</p>
+                        <div class="message-time" id="current-time"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="chat-input-container">
+                <div class="quick-actions" id="quick-actions">
+                    <button class="quick-btn" data-action="mood">How do I feel?</button>
+                    <button class="quick-btn" data-action="plan">Plan meals</button>
+                    <button class="quick-btn" data-action="progress">Check progress</button>
+                    <button class="quick-btn" data-action="tips">Get tips</button>
+                </div>
+                <div class="input-wrapper">
+                    <input type="text" id="message-input" placeholder="Type your message..." autocomplete="off">
+                    <button id="send-btn" class="send-btn">Send</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- User Profile Display -->
+        <div class="user-profile" id="user-profile">
+            <div class="profile-header">
+                <h4>Your Profile</h4>
+                <button id="toggle-profile" class="toggle-btn">−</button>
+            </div>
+            <div class="profile-content" id="profile-content">
+                <div class="profile-item">
+                    <span class="label">Goal:</span>
+                    <span class="value" id="profile-goal">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="label">Budget:</span>
+                    <span class="value" id="profile-budget">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="label">Calories Today:</span>
+                    <span class="value" id="profile-calories">-</span>
+                </div>
+                <div class="profile-item">
+                    <span class="label">Items in Cart:</span>
+                    <span class="value" id="profile-cart">-</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="chatbot.js"></script>
+
+    <!-- OPTIONAL: Example usage of the demo key (commented) -->
+    <script>
+    /*
+      Example: basic POST to the Generative API using the demo key.
+      NOTE: for browser usage, CORS may block direct calls. For production you must call the model from a server.
+    */
+    async function callGeminiDemo(prompt) {
+      try {
+        const url = window.GENERATIVE_API_URL; // built above
+        const payload = {
+          // minimal example payload shape — adapt to actual API spec you use
+          // this is demo-purpose only
+          "input": {
+            "text": prompt
+          }
+        };
+
+        const res = await fetch(url, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(payload)
+        });
+
+        if (!res.ok) {
+          const errText = await res.text();
+          console.error("API error:", res.status, errText);
+          return null;
+        }
+
+        const json = await res.json();
+        console.log("Gemini demo response:", json);
+        return json;
+      } catch (err) {
+        console.error("Network or parsing error calling Gemini demo:", err);
+        return null;
+      }
+    }
+
+    // Example: callGeminiDemo("Suggest a healthy dinner for a 2000-calorie goal");
+    </script>
+</body>
+</html>

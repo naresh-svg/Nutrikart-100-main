@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NutriKart | Sign Up</title>
+  <link rel="stylesheet" href="login.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <!-- Supabase JavaScript Client -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+
+  <div class="login-container">
+    <div class="login-box">
+      <h1>🥗 NutriKart</h1>
+      <h2>Join NutriKart!</h2>
+      <p class="subtitle">Create your account to start your healthy journey</p>
+
+      <form id="signupForm">
+        <div class="input-group">
+          <label for="username">Username</label>
+          <input type="text" id="username" placeholder="Choose a username" required />
+        </div>
+
+        <div class="input-group">
+          <label for="email">Email</label>
+          <input type="email" id="email" placeholder="Enter your email" required />
+        </div>
+
+        <div class="input-group">
+          <label for="password">Password</label>
+          <input type="password" id="password" placeholder="Create a password" required />
+        </div>
+
+        <div class="input-group">
+          <label for="confirmPassword">Confirm Password</label>
+          <input type="password" id="confirmPassword" placeholder="Confirm your password" required />
+        </div>
+
+        <button type="submit" class="btn-login">Sign Up</button>
+
+        <p class="signup-text">
+          Already have an account? <a href="login.html">Log in</a>
+        </p>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    // Supabase Configuration
+    const SUPABASE_URL = 'https://knbwwhsrsszrhrcsgvxg.supabase.co';
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuYnd3aHNyc3N6cmhyY3NndnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDIxMTUsImV4cCI6MjA3Njk3ODExNX0.W0gogF-_MIzPPWv3MoN-xPUgDaQQJzGDrXhPJsl6Qpw';
+    
+    // Initialize Supabase client
+    const { createClient } = supabase;
+    const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+    // Check if user is already logged in
+    document.addEventListener('DOMContentLoaded', async function() {
+      const { data: { user } } = await supabaseClient.auth.getUser();
+      if (user) {
+        window.location.href = 'Nutri.html';
+      }
+    });
+
+    // Signup with Supabase
+    document.getElementById('signupForm').addEventListener('submit', async function (e) {
+      e.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const confirmPassword = document.getElementById('confirmPassword').value;
+
+      // Validation
+      if (username === "" || email === "" || password === "" || confirmPassword === "") {
+        alert("Please fill in all fields.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        alert("Passwords do not match.");
+        return;
+      }
+
+      if (password.length < 6) {
+        alert("Password must be at least 6 characters long.");
+        return;
+      }
+
+      try {
+        // Create user with Supabase Auth
+        const { data, error } = await supabaseClient.auth.signUp({
+          email: email,
+          password: password,
+          options: {
+            data: {
+              username: username,
+              full_name: username
+            },
+            emailRedirectTo: `${window.location.origin}/verify-success.html`
+          }
+        });
+
+        if (error) {
+          alert("Signup failed: " + error.message);
+          return;
+        }
+
+        if (data.user) {
+          // Check if email confirmation is required
+          if (data.user.email_confirmed_at) {
+            // Email already confirmed, proceed with login
+            await handleSuccessfulSignup(data.user, username, email);
+          } else {
+            // Email confirmation required
+            alert("Account created! Please check your email and click the verification link to complete registration. 📧");
+            
+            // Show verification message
+            showVerificationMessage(email);
+          }
+        }
+      } catch (error) {
+        alert("Signup failed: " + error.message);
+      }
+    });
+
+    // Handle successful signup after email verification
+    async function handleSuccessfulSignup(user, username, email) {
+      // Create user data record
+      const userData = {
+        username: username,
+        email: email,
+        goal: "",
+        budget: 1000,
+        cart: [],
+        weeklyPlan: {},
+        reviews: [],
+        ingredients: [],
+        recipeIngredients: [],
+        dailyCalories: 0,
+        targetCalories: 2000
+      };
+
+      // Save user data to Supabase
+      const { error: dataError } = await supabaseClient
+        .from('user_data')
+        .insert({
+          user_id: user.id,
+          username: username,
+          email: email,
+          goal: "",
+          budget: 1000,
+          cart: [],
+          weekly_plan: {},
+          reviews: [],
+          ingredients: [],
+          recipe_ingredients: [],
+          daily_calories: 0,
+          target_calories: 2000
+        });
+
+      if (dataError) {
+        console.error('Error saving user data:', dataError);
+      }
+
+      // Set login status
+      localStorage.setItem('isLoggedIn', 'true');
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      localStorage.setItem('nutriKartData', JSON.stringify(userData));
+
+      alert("Account verified successfully! Welcome to NutriKart! 🎉");
+      window.location.href = "Nutri.html";
+    }
+
+    // Show verification message
+    function showVerificationMessage(email) {
+      const form = document.getElementById('signupForm');
+      form.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <h3 style="color: #7ebcaf; margin-bottom: 20px;">📧 Check Your Email</h3>
+          <p>We've sent a verification link to:</p>
+          <p style="font-weight: bold; color: #333;">${email}</p>
+          <p style="margin: 20px 0;">Click the link in your email to verify your account and complete registration.</p>
+          <div style="background: #f8f9fa; padding: 15px; border-radius: 10px; margin: 20px 0;">
+            <p style="margin: 0; font-size: 14px; color: #666;">
+              <strong>Note:</strong> After clicking the verification link, you'll be redirected to your NutriKart dashboard.
+            </p>
+          </div>
+          <button type="button" class="btn-login" onclick="location.reload()" style="margin-top: 20px;">
+            Try Again
+          </button>
+        </div>
+      `;
+    }
+
+    // Handle login link click
+    document.querySelector('.signup-text a').addEventListener('click', function(e) {
+      e.preventDefault();
+      window.location.href = 'login.html';
+    });
+  </script>
+
+</body>
+</html>
