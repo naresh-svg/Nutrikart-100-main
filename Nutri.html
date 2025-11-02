@@ -110,50 +110,59 @@
     <section id="dashboard" class="section hidden">
         <h2>My Profile</h2>
         
-        <div class="dashboard-container">
-            <div class="profile-card">
+        <div class="dashboard-container simple-layout">
+            <!-- User Information - Simplified -->
+            <div class="profile-card user-info-card">
                 <h3>User Information</h3>
-                <div class="profile-info">
-                    <p><strong>Username:</strong> <span id="profile-username">-</span></p>
-                    <p><strong>Email:</strong> <span id="profile-email">-</span></p>
-                    <p><strong>Goal:</strong> <span id="profile-goal">-</span></p>
-                    <p><strong>Budget:</strong> Rs<span id="profile-budget">-</span> / week</p>
+                <div class="profile-info simple-info">
+                    <p>Username: <span id="profile-username">-</span></p>
+                    <p>Email: <span id="profile-email">-</span></p>
+                    <p>Goal: <span id="profile-goal">-</span></p>
+                    <p>Budget: Rs <span id="profile-budget">-</span> / week</p>
                 </div>
-                <button id="edit-profile-btn" class="continue-btn">Edit Profile</button>
+                <button id="edit-profile-btn" class="simple-btn">Edit Profile</button>
             </div>
 
-            <!-- Calorie Progress -->
-            <div class="profile-card">
+            <!-- Calorie Progress - Simplified -->
+            <div class="profile-card calorie-card">
                 <h3>Today's Calorie Progress</h3>
-                <div class="calorie-tracker">
-                    <div class="calorie-display">
-                        <div class="calorie-circle">
+                <div class="simple-calorie-tracker">
+                    <div class="calorie-circle">
+                        <div class="calorie-numbers">
                             <span id="current-calories">0</span>
-                            <p>/ <span id="target-calories">2000</span> cal</p>
+                            <span class="calorie-separator">/ 2000 cal</span>
                         </div>
                     </div>
-                    <div class="progress-bar">
-                        <div id="calorie-progress" class="progress-fill"></div>
+                    <div class="simple-progress">
+                        <div class="simple-progress-text">Remaining: <span id="remaining-calories">2000</span> calories</div>
                     </div>
-                    <p class="progress-text">Remaining: <span id="remaining-calories">2000</span> calories</p>
                 </div>
             </div>
 
-            <!-- Quick Stats -->
-            <div class="profile-card">
+            <!-- Quick Stats - Simplified -->
+            <div class="profile-card stats-card">
                 <h3>Quick Stats</h3>
-                <div class="stats-grid">
-                    <div class="stat-item">
-                        <p class="stat-label">Total Spent</p>
-                        <p class="stat-value">Rs<span id="total-spent">0</span></p>
+                <div class="simple-stats">
+                    <div class="simple-stat">
+                        <div class="stat-icon">💰</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Total Spent</div>
+                            <div class="stat-value">Rs <span id="total-spent">0</span></div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <p class="stat-label">Items Added</p>
-                        <p class="stat-value"><span id="total-items">0</span></p>
+                    <div class="simple-stat">
+                        <div class="stat-icon">🛒</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Items Added</div>
+                            <div class="stat-value"><span id="total-items">0</span></div>
+                        </div>
                     </div>
-                    <div class="stat-item">
-                        <p class="stat-label">Meals Planned</p>
-                        <p class="stat-value"><span id="meals-planned">0</span></p>
+                    <div class="simple-stat">
+                        <div class="stat-icon">🍽️</div>
+                        <div class="stat-info">
+                            <div class="stat-label">Meals Planned</div>
+                            <div class="stat-value"><span id="meals-planned">0</span></div>
+                        </div>
                     </div>
                 </div>
             </div>
