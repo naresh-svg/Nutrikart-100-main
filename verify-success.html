@@ -50,8 +50,8 @@
 
   <script>
     // Supabase Configuration
-    const SUPABASE_URL = 'https://knbwwhsrsszrhrcsgvxg.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuYnd3aHNyc3N6cmhyY3NndnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDIxMTUsImV4cCI6MjA3Njk3ODExNX0.W0gogF-_MIzPPWv3MoN-xPUgDaQQJzGDrXhPJsl6Qpw';
+    const SUPABASE_URL = 'https://knbwwhsrsszrhrcsgvxg.supabase.co'
+    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtuYnd3aHNyc3N6cmhyY3NndnhnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjE0MDIxMTUsImV4cCI6MjA3Njk3ODExNX0.W0gogF-_MIzPPWv3MoN-xPUgDaQQJzGDrXhPJsl6Qpw'
     
     // Initialize Supabase client
     const { createClient } = supabase;
@@ -60,6 +60,25 @@
     // Handle email verification and redirect
     document.addEventListener('DOMContentLoaded', async function() {
       try {
+        // Get hash parameters from URL
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const accessToken = hashParams.get('access_token');
+        const refreshToken = hashParams.get('refresh_token');
+        
+        if (accessToken && refreshToken) {
+          // Set session with tokens from URL
+          const { data, error } = await supabaseClient.auth.setSession({
+            access_token: accessToken,
+            refresh_token: refreshToken
+          });
+          
+          if (error) {
+            console.error('Error setting session:', error);
+            window.location.href = 'login.html';
+            return;
+          }
+        }
+        
         // Check if user is authenticated
         const { data: { user }, error } = await supabaseClient.auth.getUser();
         
