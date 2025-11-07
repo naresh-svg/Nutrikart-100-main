@@ -847,17 +847,29 @@ async function loadGroceries(category) {
       console.error('Error loading groceries:', error);
       // Fallback to local data
       const items = groceries[userData.goal][category] || []
-      renderGroceryItems(items, grid)
+      renderGroceryItems(dedupeGroceries(items), grid)
       return
     }
 
-    renderGroceryItems(data || [], grid)
+    renderGroceryItems(dedupeGroceries(data || []), grid)
   } catch (error) {
     console.error('Error loading groceries:', error);
     // Fallback to local data
     const items = groceries[userData.goal][category] || []
-    renderGroceryItems(items, grid)
+    renderGroceryItems(dedupeGroceries(items), grid)
   }
+}
+
+function dedupeGroceries(items) {
+  const seen = new Set()
+  return items.filter((item) => {
+    const key = `${(item.name || "").toLowerCase()}|${item.price ?? ""}`
+    if (seen.has(key)) {
+      return false
+    }
+    seen.add(key)
+    return true
+  })
 }
 
 // Render grocery items
