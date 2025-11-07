@@ -66,7 +66,7 @@ For quick testing, use the demo account:
 ## Browser Compatibility
 
 Works on all modern browsers that support:
-- ES6 JavaScript features
+- JavaScript features
 - localStorage API
 - CSS Grid and Flexbox
 
