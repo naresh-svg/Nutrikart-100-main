@@ -1905,34 +1905,32 @@ function loadLeaderboard() {
   
   grid.innerHTML = sortedUsers.map((user, index) => {
     const rank = index + 1;
-    const topClass = rank === 1 ? 'top-1' : rank === 2 ? 'top-2' : rank === 3 ? 'top-3' : '';
-    const rankClass = rank <= 3 ? 'top-rank' : '';
+    const topClass = rank <= 3 ? `top-${rank}` : '';
     
     return `
       <div class="leaderboard-card ${topClass}" onclick="openProfileModal(${user.id})">
-        <span class="rank-badge ${rankClass}">#${rank}</span>
+        <div class="rank-badge">#${rank}</div>
         
         <div class="profile-section">
           <img src="${user.avatar}" alt="${user.name}" class="profile-avatar">
           <div class="profile-data">
             <h3>${user.name}</h3>
-            <span class="profile-role">${user.role}</span>
-            <span class="level-badge ${user.level}">${user.level}</span>
-            ${user.aiEnabled ? '<span class="ai-enabled-badge">🤖 AI Chat</span>' : ''}
+            <div class="profile-meta">
+              <span class="profile-role">${user.role}</span>
+              <span class="level-badge ${user.level}">${user.level}</span>
+              ${user.aiEnabled ? '<span class="ai-badge">AI</span>' : ''}
+            </div>
           </div>
         </div>
         
         <div class="stats-row">
           <div class="stat-box">
-            <span class="stat-label">IQ Score</span>
+            <span class="stat-label">Score</span>
             <span class="stat-value">${user.score}</span>
-            <div class="progress-bar">
-              <div class="progress-fill" style="width: ${user.score}%"></div>
-            </div>
           </div>
           <div class="stat-box">
             <span class="stat-label">Streak</span>
-            <span class="stat-value"><span class="stat-icon">🔥</span>${user.streak}</span>
+            <span class="stat-value">${user.streak} days</span>
           </div>
         </div>
       </div>
